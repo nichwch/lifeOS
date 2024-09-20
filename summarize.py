@@ -1,12 +1,10 @@
+import json
 import os
 from datetime import datetime, timedelta
 from collections import defaultdict
-import anthropic
+import litellm
+from litellm import completion
 import concurrent
-
-# Initialize the Anthropic client
-print(os.environ.get("ANTHROPIC_API_KEY"))
-client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 
 def group_files_by_week(directory):
@@ -30,24 +28,21 @@ def group_files_by_week(directory):
     return dict(files_by_week)
 
 
-def summarize_weekly_notes(client, all_text_in_week):
-    print('summarizing' )
-    message = client.messages.create(
-        model="claude-3-opus-20240229",
-        max_tokens=1000,
-        temperature=0.5,
-        system="You are a helpful assistant that summarizes weekly notes. Provide a concise summary of the key points and themes from the given text.",
+def summarize_weekly_notes(all_text_in_week, model="gpt-4o"):
+    print('summarizing')
+    response = completion(
+        model=model,
         messages=[
-            {
-                "role": "user",
-                "content": f"Please summarize the following weekly notes:\n\n{all_text_in_week}"
-            }
-        ]
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": f"Please summarize the following weekly notes:\n\n{all_text_in_week}"}
+        ],
+        max_tokens=1000,
+        temperature=0.5
     )
     print('summarized')
     
     # Extract the summary from the response
-    return message.content[0].text
+    return response['choices'][0]['message']['content']
 
 
 def main():
@@ -67,7 +62,7 @@ def main():
             with open(os.path.join(expanded_dir, file), 'r') as f:
                 all_text_in_week += f'#### {file}\n\n' + f.read()
         
-        weekly_summary = summarize_weekly_notes(client, all_text_in_week)
+        weekly_summary = summarize_weekly_notes(all_text_in_week)
         
         return {
             'week': week,
@@ -79,7 +74,10 @@ def main():
         summaries = list(executor.map(process_week, sorted_weeks))
     
     print(summaries)
-    return summaries
+    output_file = os.path.join(os.path.dirname(__file__), 'weekly_summaries.json')
+    with open(output_file, 'w') as f:
+        json.dump(summaries, f, indent=4)
+    print(f'Summaries written to {output_file}')
 
 if __name__ == "__main__":
     main()
