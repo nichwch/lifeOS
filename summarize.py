@@ -26,7 +26,7 @@ def group_files_by_week(directory):
     return dict(files_by_week)
 
 
-def summarize_weekly_notes(all_text_in_week, model="gpt-4o", context=""):
+def summarize_weekly_notes(all_text_in_week, context):
     print('summarizing')
     response = openai.chat.completions.create(
         model='gpt-4o',
@@ -79,10 +79,10 @@ Here are the weekly notes:
                         },
                         "context":{
                             "type":"string",
-                            "description":"""A new summary of the author's overall life, given the context given in the prompt. 
-                            Include any context that will be important for the next iteration of summaries. 
-                            Base your new summary off the old context given in the prompt, and simply output that context unchanged 
-                            if nothing much has changed in the author's life."""
+                            "description":"""A new summary of the author's overall life, based on the context given in the prompt. 
+                            Begin with the old context given in the prompt, and ONLY change it if the author's life has changed significantly. 
+                            Remove information if it's no longer relevant, or add information if something significant has happened in the author's life. 
+                            If the summary begins to get too long (say, longer than 7 sentences), summarize it down, or remove information that's no longer relevant."""
                         }
                     },
                     "required": ["key_points", "main_themes", "overall_summary"]
@@ -114,14 +114,13 @@ def main():
         timestamp = datetime.strptime(week, "%Y-%m-%d").timestamp()
         all_text_in_week = ''
         print('processing week', week)
-        print('context', context)
         for file in files:
             with open(os.path.join(expanded_dir, file), 'r') as f:
                 all_text_in_week += f'#### {file}\n\n' + f.read()
         
         weekly_summary = summarize_weekly_notes(all_text_in_week, context)
         context = weekly_summary['context']
-        
+        print('context', context)
         summaries.append({
             'week': week,
             'timestamp': timestamp,
