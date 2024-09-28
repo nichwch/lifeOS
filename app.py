@@ -1,14 +1,14 @@
 from flask import Flask
-
+from flask_cors import CORS
+import json
+import os
 import summarize
 
 app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes
 
 @app.route("/weekly_summaries")
 def weekly_summaries():
-    import json
-    import os
-
     # Get the directory of the current script
     current_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the path to weekly_summaries.json
@@ -18,7 +18,10 @@ def weekly_summaries():
         weekly_summaries = json.load(file)
     return json.dumps(weekly_summaries, indent=4)
 
-
-@app.post('/summarize')
+@app.route('/summarize', methods=['POST'])
 def summarize_notes():
     summarize.main()
+    return "Summarization complete", 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
