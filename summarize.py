@@ -33,6 +33,7 @@ def summarize_weekly_notes(all_text_in_week, context):
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"""Please summarize the following weekly notes, given the following context. 
+Write everything in the second person, in the past tense - e.g. "This week, you were focused on fixing your sleep."
 You can ignore TODOs and other transient content - try and focus on the big picture. Here is some helpful context about the author's life right now:
 
 {context}
@@ -48,38 +49,33 @@ Here are the weekly notes:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "main_themes": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "List of main themes or topics discussed in the notes"
-                        },
                         "overall_summary": {
                             "type": "string",
-                            "description": "A brief overall summary of the week's notes"
+                            "description": "A brief overall summary of the week's notes, in the second person past tense."
                         },
                         "ideas":{
                             "type":"string",
-                            "description":"A summary of ideas or thoughts that the author wants to explore. Leave blank if there aren't ideas."
+                            "description":"A summary of ideas or thoughts that the author wants to explore. Leave blank if there aren't ideas, in the second person past tense."
                         },
                         "dreams":{
                             "type":"string",
-                            "description":"A summary of dreams that the author has recorded from sleeping. Leave blank if there aren't dreams."
+                            "description":"A summary of dreams that the author has recorded from sleeping. Leave blank if there aren't dreams, in the second person past tense."
                         },
                         "life":{
                             "type":"string",
-                            "description":"A summary of life events that the author wants to remember. Leave blank if there aren't life events."
+                            "description":"A summary of life events that the author wants to remember. Leave blank if there aren't life events, in the second person past tense."
                         },
                         "gratitude":{
                             "type":"string",
-                            "description":"A summary of things that the author is grateful for. Leave blank if there aren't things to be grateful for."
+                            "description":"A summary of things that the author is grateful for. Leave blank if there aren't things to be grateful for, in the second person past tense."
                         },
                         "complaints":{
                             "type":"string",
-                            "description":"A summary of complaints that the author has. Leave blank if there aren't complaints."
+                            "description":"A summary of complaints that the author has. Leave blank if there aren't complaints, in the second person past tense."
                         },
                         "context":{
                             "type":"string",
-                            "description":"""A new summary of the author's overall life, based on the context given in the prompt. 
+                                "description":"""A new summary of the author's overall life, based on the context given in the prompt. 
                             Begin with the old context given in the prompt, and ONLY change it if the author's life has changed significantly. 
                             Remove information if it's no longer relevant, or add information if something significant has happened in the author's life. 
                             If the summary begins to get too long (say, longer than 7 sentences), summarize it down, or remove information that's no longer relevant."""

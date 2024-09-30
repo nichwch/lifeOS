@@ -5,7 +5,16 @@ import { useState, useEffect } from "react";
 interface WeeklySummary {
   week: string;
   timestamp: number;
-  summary: string;
+  summary: {
+    main_themes: string[];
+    overall_summary: string;
+    ideas?: string;
+    dreams?: string;
+    life?: string;
+    gratitude?: string;
+    complaints?: string;
+    context?: string;
+  };
 }
 
 export default function Home() {
@@ -43,20 +52,60 @@ export default function Home() {
   return (
     <div className="min-h-screen p-8">
       <h1 className="text-3xl font-bold mb-6">Weekly Summaries</h1>
-      {summaries.map((summary) => (
-        <div key={summary.week} className="mb-6 border rounded-lg p-4">
-          <h2
-            className="text-xl font-semibold mb-2 cursor-pointer"
-            onClick={() => toggleWeek(summary.week)}
-          >
-            {formatWeekDate(summary.timestamp)}
-            {expandedWeeks.has(summary.week) ? " 🔽" : " 🔼"}
-          </h2>
-          {expandedWeeks.has(summary.week) && (
-            <div className="whitespace-pre-wrap">{summary.summary}</div>
-          )}
-        </div>
-      ))}
+      {summaries
+        .slice()
+        .reverse()
+        .map((summary) => (
+          <div key={summary.week} className="mb-6 border rounded-lg p-4">
+            <h2
+              className="text-xl font-semibold mb-2 cursor-pointer"
+              onClick={() => toggleWeek(summary.week)}
+            >
+              {formatWeekDate(summary.timestamp)}
+              {expandedWeeks.has(summary.week) ? " v" : " ^"}
+            </h2>
+            {expandedWeeks.has(summary.week) && (
+              <div className="whitespace-pre-wrap flex flex-wrap gap-4">
+                {summary.summary.overall_summary && (
+                  <div className="w-1/4 border border-black p-2">
+                    <h1 className="text-lg mb-2">overall</h1>
+                    <div>{summary.summary.overall_summary}</div>
+                  </div>
+                )}
+                {summary.summary.ideas && (
+                  <div className="w-1/4 border border-black p-2">
+                    <h1 className="text-lg mb-2">ideas</h1>
+                    <div>{summary.summary.ideas}</div>
+                  </div>
+                )}
+                {summary.summary.dreams && (
+                  <div className="w-1/4 border border-black p-2">
+                    <h1 className="text-lg mb-2">dreams</h1>
+                    <div>{summary.summary.dreams}</div>
+                  </div>
+                )}
+                {summary.summary.life && (
+                  <div className="w-1/4 border border-black p-2">
+                    <h1 className="text-lg mb-2">life</h1>
+                    <div>{summary.summary.life}</div>
+                  </div>
+                )}
+                {summary.summary.complaints && (
+                  <div className="w-1/4 border border-black p-2">
+                    <h1 className="text-lg mb-2">complaints</h1>
+                    <div>{summary.summary.complaints}</div>
+                  </div>
+                )}
+                {summary.summary.gratitude && (
+                  <div className="w-1/4 border border-black p-2">
+                    <h1 className="text-lg mb-2">gratitude</h1>
+                    <div>{summary.summary.gratitude}</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
     </div>
   );
 }
