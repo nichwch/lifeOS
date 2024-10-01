@@ -51,57 +51,47 @@ export default function Home() {
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-6">Weekly Summaries</h1>
       {summaries
         .slice()
         .reverse()
         .map((summary) => (
-          <div key={summary.week} className="mb-6 border rounded-lg p-4">
+          <div key={summary.week} className="mb-6 p-4">
             <h2
-              className="text-xl font-semibold mb-2 cursor-pointer"
+              className="
+              s mb-2 cursor-pointer"
               onClick={() => toggleWeek(summary.week)}
             >
               {formatWeekDate(summary.timestamp)}
               {expandedWeeks.has(summary.week) ? " v" : " ^"}
             </h2>
             {expandedWeeks.has(summary.week) && (
-              <div className="whitespace-pre-wrap flex flex-wrap gap-4">
+              <div className="whitespace-pre-wrap flex gap-4">
                 {summary.summary.overall_summary && (
-                  <div className="w-1/4 border border-black p-2">
+                  <div className="basis-1/3 shrink-0 border border-black p-2">
                     <h1 className="text-lg mb-2">overall</h1>
                     <div>{summary.summary.overall_summary}</div>
                   </div>
                 )}
-                {summary.summary.ideas && (
-                  <div className="w-1/4 border border-black p-2">
-                    <h1 className="text-lg mb-2">ideas</h1>
-                    <div>{summary.summary.ideas}</div>
-                  </div>
-                )}
-                {summary.summary.dreams && (
-                  <div className="w-1/4 border border-black p-2">
-                    <h1 className="text-lg mb-2">dreams</h1>
-                    <div>{summary.summary.dreams}</div>
-                  </div>
-                )}
-                {summary.summary.life && (
-                  <div className="w-1/4 border border-black p-2">
-                    <h1 className="text-lg mb-2">life</h1>
-                    <div>{summary.summary.life}</div>
-                  </div>
-                )}
-                {summary.summary.complaints && (
-                  <div className="w-1/4 border border-black p-2">
-                    <h1 className="text-lg mb-2">complaints</h1>
-                    <div>{summary.summary.complaints}</div>
-                  </div>
-                )}
-                {summary.summary.gratitude && (
-                  <div className="w-1/4 border border-black p-2">
-                    <h1 className="text-lg mb-2">gratitude</h1>
-                    <div>{summary.summary.gratitude}</div>
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-4">
+                  {Object.entries(summary.summary).map(([key, value]) => {
+                    if (
+                      key !== "overall_summary" &&
+                      key !== "main_themes" &&
+                      value
+                    ) {
+                      return (
+                        <div
+                          key={key}
+                          className="w-[250px] h-[250px] border overflow-y-auto border-black p-2"
+                        >
+                          <h1 className="text-lg mb-2">{key}</h1>
+                          <div>{value}</div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
               </div>
             )}
           </div>
