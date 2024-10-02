@@ -77,6 +77,7 @@ export default function Home() {
                     if (
                       key !== "overall_summary" &&
                       key !== "main_themes" &&
+                      key !== "context" &&
                       value
                     ) {
                       return (
