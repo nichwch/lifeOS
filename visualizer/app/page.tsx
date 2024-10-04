@@ -64,7 +64,7 @@ export default function Home() {
                     <div>{summary.summary.overall_summary}</div>
                   </div>
                 )}
-                <div className="flex flex-wrap gap-4 p-3 bg-orange-400/30 shadow-inner grow">
+                <div className="flex flex-wrap gap-4 p-3 bg-orange-300/30 shadow-inner grow">
                   {Object.entries(summary.summary).map(([key, value]) => {
                     const bgColor =
                       key === "dreams"
