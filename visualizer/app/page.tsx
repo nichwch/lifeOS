@@ -19,12 +19,27 @@ interface WeeklySummary {
 
 export default function Home() {
   const [summaries, setSummaries] = useState<WeeklySummary[]>([]);
+  const [noteDirectory, setNoteDirectory] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/weekly_summaries")
-      .then((response) => response.json())
-      .then((data) => setSummaries(data));
-  }, []);
+    const fetchSummaries = async () => {
+      try {
+        // Encode the directory path for the URL
+        const encodedDirectory = encodeURIComponent("~/" + noteDirectory);
+
+        // Fetch the summaries
+        const response = await fetch(
+          `http://127.0.0.1:5000/weekly_summaries?directory=${encodedDirectory}`
+        );
+        const data = await response.json();
+        setSummaries(data);
+      } catch (error) {
+        console.error("Error fetching summaries:", error);
+      }
+    };
+
+    fetchSummaries();
+  }, [noteDirectory]);
 
   const formatWeekDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
@@ -39,8 +54,22 @@ export default function Home() {
   return (
     <>
       <div className="min-h-screen mx-auto w-full lg:w-[900px]">
-        <div className="fixed z-[99999] top-0 h-[30px] bg-orange-200 border border-black px-2">
-          summarizer
+        <div className="fixed z-[99999] top-0 h-[40px] w-full lg:w-[900px] bg-orange-200 border border-black p-2">
+          <div className="flex items-center justify-between">
+            <span>summarizer</span>
+            <input
+              type="text"
+              placeholder="Enter directory path"
+              className="border border-black px-2 py-1 text-sm"
+              value={noteDirectory || ""}
+              onChange={(e) => {
+                // Handle directory change
+                // You might want to add state and a function to handle this
+                setNoteDirectory(e.target.value);
+                console.log(noteDirectory);
+              }}
+            />
+          </div>
         </div>
         {summaries
           .slice()
@@ -51,7 +80,7 @@ export default function Home() {
               className="mb-6 mt-10 bg-orange-200 relative shadow-md"
             >
               <h2
-                className={`sticky z-50 top-[30px] px-2 border border-black bg-orange-200 shadow-md`}
+                className={`sticky z-50 top-[40px] p-2 border border-black bg-orange-200 shadow-md`}
               >
                 Week of{" "}
                 <span className="underline">

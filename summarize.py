@@ -10,19 +10,25 @@ def group_files_by_week(directory):
     for filename in os.listdir(directory):
         if os.path.isfile(os.path.join(directory, filename)):
             try:
-                # Parse the date from the filename
-                file_date = datetime.strptime(filename.split('.')[0], "%a %b %d %Y")
+                # Try parsing the date from the filename with and without day of the week
+                try:
+                    file_date = datetime.strptime(filename.split('.')[0], "%a %b %d %Y")
+                except ValueError:
+                    try:
+                        file_date = datetime.strptime(filename.split('.')[0], "%b %d %Y")
+                    except ValueError:
+                        raise ValueError(f"Unable to parse date from filename: {filename}")
+                
                 # Calculate the start of the week (Monday)
                 start_of_week = file_date - timedelta(days=file_date.weekday())
                 # Use the start of the week as the key
                 week_key = start_of_week.strftime("%Y-%m-%d")
                 # Add the filename to the appropriate week
                 files_by_week[week_key].append(filename)
-            except ValueError:
-                print('error', filename)
+            except ValueError as e:
+                print(f'Error processing file {filename}: {str(e)}')
                 # Skip files that don't match the expected date format
                 continue
-    
     return dict(files_by_week)
 
 
@@ -94,11 +100,12 @@ Here are the weekly notes:
     return function_response
 
 
-def main():
+def summarize_weekly_notes_in_dir(dir):
     # Set your OpenAI API key
+    dir = os.path.expanduser(dir)
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    expanded_dir = os.path.expanduser('~/notes')
+    expanded_dir = os.path.expanduser(dir)
     weeks = group_files_by_week(expanded_dir)
 
     summaries = []
@@ -120,14 +127,14 @@ def main():
         summaries.append({
             'week': week,
             'timestamp': timestamp,
-            'summary': weekly_summary
+            'summary': weekly_summary  
         })
     
     print(summaries)
-    output_file = os.path.join(os.path.dirname(__file__), 'weekly_summaries.json')
+    output_file = os.path.join(os.path.dirname(__file__), f'{dir}/weekly_summaries.json')
     with open(output_file, 'w') as f:
         json.dump(summaries, f, indent=4)
     print(f'Summaries written to {output_file}')
 
 if __name__ == "__main__":
-    main()
+    summarize_weekly_notes_in_dir('~/work-notes')
