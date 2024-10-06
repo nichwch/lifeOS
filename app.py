@@ -1,7 +1,9 @@
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
 import os
+
+import requests
 import summarize
 
 app = Flask(__name__)
@@ -27,3 +29,44 @@ def summarize_notes():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/get_links', methods=['POST'])
+def get_links():
+    print('here!')
+    # Get the text from the request body
+    data = request.json
+    text = data.get('text')
+    
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    try:
+        # Make a request to Exa's API
+        exa_api_key = os.environ.get('EXA_API_KEY')
+        print('exa_api_key', exa_api_key)
+        if not exa_api_key:
+            return jsonify({"error": "EXA_API_KEY not set in environment variables"}), 500
+
+        headers = {
+            "Content-Type": "application/json",
+            "x-api-key": exa_api_key
+        }
+        
+        payload = {
+            "query": text,
+            "num_results": 5,  # Adjust as needed
+            "use_autoprompt": True
+        }
+        
+        response = requests.post("https://api.exa.ai/search", headers=headers, json=payload)
+        response.raise_for_status()
+        
+        # Extract relevant links from the response
+        results = response.json().get('results', [])
+        links = [{"title": result.get('title'), "url": result.get('url')} for result in results]
+        
+        return jsonify({"links": links})
+    
+    except requests.RequestException as e:
+        return jsonify({"error": f"Error fetching links: {str(e)}"}), 500
+
