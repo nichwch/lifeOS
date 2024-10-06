@@ -17,15 +17,14 @@ interface WeeklySummary {
   };
 }
 
-export default function Home() {
+export default function Home({ params }: { params: { dir: string } }) {
   const [summaries, setSummaries] = useState<WeeklySummary[]>([]);
-  const [noteDirectory, setNoteDirectory] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSummaries = async () => {
       try {
         // Encode the directory path for the URL
-        const encodedDirectory = encodeURIComponent("~/" + noteDirectory);
+        const encodedDirectory = encodeURIComponent("~/" + params.dir);
 
         // Fetch the summaries
         const response = await fetch(
@@ -39,7 +38,7 @@ export default function Home() {
     };
 
     fetchSummaries();
-  }, [noteDirectory]);
+  }, [params.dir]);
 
   const formatWeekDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
@@ -57,18 +56,6 @@ export default function Home() {
         <div className="fixed z-[99999] top-0 h-[40px] w-full lg:w-[900px] bg-orange-200 border border-black p-2">
           <div className="flex items-center justify-between">
             <span>summarizer</span>
-            <input
-              type="text"
-              placeholder="Enter directory path"
-              className="border border-black px-2 py-1 text-sm"
-              value={noteDirectory || ""}
-              onChange={(e) => {
-                // Handle directory change
-                // You might want to add state and a function to handle this
-                setNoteDirectory(e.target.value);
-                console.log(noteDirectory);
-              }}
-            />
           </div>
         </div>
         {summaries
