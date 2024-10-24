@@ -24,8 +24,23 @@ def weekly_summaries():
 @app.route('/summarize/<path:directory>', methods=['POST'])
 def summarize_notes():
     directory = request.args.get('directory', '~/notes')  # Default to '~/notes' if not provided
-    summarize.summarize_weekly_notes_in_dir(directory)
+    summarize.summarize_new_notes(directory)
     return "Summarization complete", 200
+
+@app.route('/unsummarized_count')
+def unsummarized_count():
+    directory = request.args.get('directory', '~/notes')  # Default to '~/notes' if not provided
+    expanded_dir = os.path.expanduser(directory)
+    json_file_path = os.path.join(expanded_dir, 'weekly_summaries.json')
+    
+    unsummarized_weeks = summarize.get_unsummarized_weeks(directory, json_file_path)
+    
+    total_unsummarized_notes = sum(len(files) for files in unsummarized_weeks.values())
+    
+    return jsonify({
+        'unsummarized_count': total_unsummarized_notes,
+        'unsummarized_weeks': len(unsummarized_weeks)
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

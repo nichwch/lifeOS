@@ -100,19 +100,40 @@ Here are the weekly notes:
     return function_response
 
 
-def summarize_weekly_notes_in_dir(dir):
-    # Set your OpenAI API key
-    dir = os.path.expanduser(dir)
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-
-    expanded_dir = os.path.expanduser(dir)
-    weeks = group_files_by_week(expanded_dir)
-
-    summaries = []
-
-    sorted_weeks = sorted(weeks.items(), key=lambda x: datetime.strptime(x[0], "%Y-%m-%d"), reverse=False)
+def get_unsummarized_weeks(directory, output_file):
+    expanded_dir = os.path.expanduser(directory)
+    all_weeks = group_files_by_week(expanded_dir)
     
-    context = ''
+    try:
+        with open(output_file, 'r') as f:
+            summaries = json.load(f)
+        summarized_weeks = set(summary['week'] for summary in summaries)
+        unsummarized_weeks = {week: files for week, files in all_weeks.items() if week not in summarized_weeks}
+    except FileNotFoundError:
+        unsummarized_weeks = all_weeks
+    
+    return unsummarized_weeks
+
+def summarize_new_notes(directory):
+    expanded_dir = os.path.expanduser(directory)
+    output_file = os.path.join(os.path.dirname(__file__), f'{expanded_dir}/weekly_summaries.json')
+    
+    unsummarized_weeks = get_unsummarized_weeks(expanded_dir, output_file)
+    
+    if not unsummarized_weeks:
+        print("No new weeks to summarize.")
+        return
+    
+    try:
+        with open(output_file, 'r') as f:
+            summaries = json.load(f)
+        context = summaries[-1]['summary']['context'] if summaries else ''
+    except FileNotFoundError:
+        summaries = []
+        context = ''
+    
+    sorted_weeks = sorted(unsummarized_weeks.items(), key=lambda x: datetime.strptime(x[0], "%Y-%m-%d"))
+    
     for week, files in sorted_weeks:
         timestamp = datetime.strptime(week, "%Y-%m-%d").timestamp()
         all_text_in_week = ''
@@ -129,12 +150,14 @@ def summarize_weekly_notes_in_dir(dir):
             'timestamp': timestamp,
             'summary': weekly_summary  
         })
+        
+        # Write to the output file after each summary is generated
+        summaries.sort(key=lambda x: x['timestamp'])
+        with open(output_file, 'w') as f:
+            json.dump(summaries, f, indent=4)
+        print(f'Updated summary for week {week} written to {output_file}')
     
-    print(summaries)
-    output_file = os.path.join(os.path.dirname(__file__), f'{dir}/weekly_summaries.json')
-    with open(output_file, 'w') as f:
-        json.dump(summaries, f, indent=4)
-    print(f'Summaries written to {output_file}')
+    print(f'All summaries written to {output_file}')
 
 if __name__ == "__main__":
-    summarize_weekly_notes_in_dir('~/work-notes')
+    summarize_new_notes('~/notes')
