@@ -22,8 +22,9 @@ def weekly_summaries():
 @app.route('/summarize/<path:directory>', methods=['POST'])
 def summarize_notes():
     directory = request.args.get('directory', '~/notes')  # Default to '~/notes' if not provided
-    summarize.summarize_weekly_notes_in_dir(directory)
+    summarize.summarize_new_notes(directory)
     return "Summarization complete", 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)
