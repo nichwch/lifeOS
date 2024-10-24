@@ -150,12 +150,14 @@ def summarize_new_notes(directory):
             'timestamp': timestamp,
             'summary': weekly_summary  
         })
+        
+        # Write to the output file after each summary is generated
+        summaries.sort(key=lambda x: x['timestamp'])
+        with open(output_file, 'w') as f:
+            json.dump(summaries, f, indent=4)
+        print(f'Updated summary for week {week} written to {output_file}')
     
-    summaries.sort(key=lambda x: x['timestamp'])
-    
-    with open(output_file, 'w') as f:
-        json.dump(summaries, f, indent=4)
-    print(f'Updated summaries written to {output_file}')
+    print(f'All summaries written to {output_file}')
 
 if __name__ == "__main__":
     summarize_new_notes('~/notes')
