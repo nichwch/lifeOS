@@ -19,26 +19,57 @@ interface WeeklySummary {
 
 export default function Home({ params }: { params: { dir: string } }) {
   const [summaries, setSummaries] = useState<WeeklySummary[]>([]);
+  const [unsummarizedCount, setUnsummarizedCount] = useState<number | null>(
+    null
+  );
+  const [isSummarizing, setIsSummarizing] = useState(false);
 
   useEffect(() => {
-    const fetchSummaries = async () => {
-      try {
-        // Encode the directory path for the URL
-        const encodedDirectory = encodeURIComponent("~/" + params.dir);
-
-        // Fetch the summaries
-        const response = await fetch(
-          `http://127.0.0.1:5000/weekly_summaries?directory=${encodedDirectory}`
-        );
-        const data = await response.json();
-        setSummaries(data);
-      } catch (error) {
-        console.error("Error fetching summaries:", error);
-      }
-    };
-
-    fetchSummaries();
+    fetchData();
   }, [params.dir]);
+
+  const fetchData = async () => {
+    try {
+      const encodedDirectory = encodeURIComponent("~/" + params.dir);
+
+      // Fetch summaries
+      const summariesResponse = await fetch(
+        `http://127.0.0.1:5000/weekly_summaries?directory=${encodedDirectory}`
+      );
+      const summariesData = await summariesResponse.json();
+      setSummaries(summariesData);
+
+      // Fetch unsummarized count
+      const countResponse = await fetch(
+        `http://127.0.0.1:5000/unsummarized_count?directory=${encodedDirectory}`
+      );
+      const countData = await countResponse.json();
+      setUnsummarizedCount(countData.unsummarized_count);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleSummarize = async () => {
+    setIsSummarizing(true);
+    try {
+      const encodedDirectory = encodeURIComponent("~/" + params.dir);
+      const response = await fetch(
+        `http://127.0.0.1:5000/summarize?directory=${encodedDirectory}`,
+        {
+          method: "POST",
+        }
+      );
+      if (response.ok) {
+        await fetchData(); // Refresh data after summarization
+      } else {
+        console.error("Error summarizing notes");
+      }
+    } catch (error) {
+      console.error("Error summarizing notes:", error);
+    }
+    setIsSummarizing(false);
+  };
 
   const formatWeekDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
@@ -56,6 +87,22 @@ export default function Home({ params }: { params: { dir: string } }) {
         <div className="fixed z-[99999] top-0 h-[40px] w-full lg:w-[900px] bg-orange-200 border border-black p-2">
           <div className="flex items-center justify-between">
             <span>summarizer</span>
+            <div className="flex items-center space-x-2">
+              {unsummarizedCount !== null && (
+                <span className="bg-blue-100 border border-blue-600 text-blue-600 px-1 text-sm">
+                  {unsummarizedCount} unsummarized notes
+                </span>
+              )}
+              {unsummarizedCount !== null && unsummarizedCount > 0 && (
+                <button
+                  onClick={handleSummarize}
+                  disabled={isSummarizing}
+                  className="bg-green-100 hover:bg-green-300 disabled:bg-green-100 border border-green-600 text-green-600 px-1 text-sm"
+                >
+                  {isSummarizing ? "summarizing..." : "summarize new notes"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
         {summaries
