@@ -44,9 +44,6 @@ def unsummarized_count():
         'unsummarized_weeks': len(unsummarized_weeks)
     })
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 @app.route('/get_links', methods=['POST'])
 def get_links():
     print('here!')
@@ -125,4 +122,7 @@ def chat():
     
     except requests.RequestException as e:
         return jsonify({"error": f"Error calling OpenAI API: {str(e)}"}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
