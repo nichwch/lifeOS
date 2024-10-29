@@ -6,8 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-screen mx-auto w-full lg:w-[900px] p-4 pt-20 flex">
       <div className="flex flex-col">
-        <h1 className="mb-10">LifeOS</h1>
-        <h1>directory:</h1>
+        <h1 className="mb-10 font-bold">LifeOS</h1>
         <Link href="/summary/notes">summaries</Link>
         <Link href="/advice/notes">advice</Link>
       </div>
