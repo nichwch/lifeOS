@@ -27,6 +27,8 @@ def summarize_notes():
     summarize.summarize_new_notes(directory)
     return "Summarization complete", 200
 
+
+
 @app.route('/unsummarized_count')
 def unsummarized_count():
     directory = request.args.get('directory', '~/notes')  # Default to '~/notes' if not provided
@@ -84,4 +86,43 @@ def get_links():
     
     except requests.RequestException as e:
         return jsonify({"error": f"Error fetching links: {str(e)}"}), 500
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    # Get OpenAI API key from environment variables
+    openai_api_key = os.environ.get('OPENAI_API_KEY')
+    if not openai_api_key:
+        return jsonify({"error": "OPENAI_API_KEY not set in environment variables"}), 500
+
+    # Get the request data
+    data = request.json
+    messages = data.get('messages')
+    
+    if not messages:
+        return jsonify({"error": "No messages provided"}), 400
+
+    try:
+        # Make request to OpenAI API
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {openai_api_key}"
+        }
+        
+        payload = {
+            "model": "gpt-4-turbo-preview",  # or "gpt-4" depending on your needs
+            "messages": messages
+        }
+        
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers=headers,
+            json=payload
+        )
+        response.raise_for_status()
+        
+        # Return the response from OpenAI
+        return jsonify(response.json())
+    
+    except requests.RequestException as e:
+        return jsonify({"error": f"Error calling OpenAI API: {str(e)}"}), 500
 
