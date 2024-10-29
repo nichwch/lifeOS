@@ -1,13 +1,23 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen mx-auto w-full lg:w-[900px] p-4 pt-20 flex flex-col">
-      <h1 className="mb-10">LifeOS</h1>
-      <h1>directory:</h1>
-      <Link href="/summary/notes">summaries</Link>
-      <Link href="/advice/notes">advice</Link>
+    <div className="min-h-screen mx-auto w-full lg:w-[900px] p-4 pt-20 flex">
+      <div className="flex flex-col">
+        <h1 className="mb-10">LifeOS</h1>
+        <h1>directory:</h1>
+        <Link href="/summary/notes">summaries</Link>
+        <Link href="/advice/notes">advice</Link>
+      </div>
+      <div className="ml-48 flex border-[2.5px] border-black h-[700px] box-content">
+        <img
+          src="./temple.JPG"
+          alt="temple"
+          className="h-[700px] grayscale sepia opacity-70"
+        />
+      </div>
     </div>
   );
 }
