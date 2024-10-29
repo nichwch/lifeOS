@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Link from "next/link";
+import { HomeButton } from "@/components/HomeButton";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,12 +30,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-orange-200/50`}
       >
         {children}
+        <HomeButton />
       </body>
-      <div className="fixed top-5 left-5 bg-orange-200/50 hover:bg-orange-200 px-1 border border-black">
-        <Link href="/" className="no-underline text-black visited:text-black">
-          home
-        </Link>
-      </div>
     </html>
   );
 }
