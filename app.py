@@ -118,6 +118,7 @@ def chat():
         response.raise_for_status()
         
         # Return the response from OpenAI
+        print('response', response.json())
         return jsonify(response.json())
     
     except requests.RequestException as e:
