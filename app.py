@@ -124,6 +124,47 @@ def chat():
     except requests.RequestException as e:
         return jsonify({"error": f"Error calling OpenAI API: {str(e)}"}), 500
 
+@app.route('/read_file', methods=['GET'])
+def read_file():
+    # Get the file path from query parameters
+    file_path = request.args.get('path')
+    if not file_path:
+        return jsonify({"error": "No file path provided"}), 400
+
+    # Expand user path if necessary (e.g., ~/documents)
+    file_path = os.path.expanduser(file_path)
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        return jsonify({"content": content})
+    except FileNotFoundError:
+        return jsonify({"error": f"File not found: {file_path}"}), 404
+    except Exception as e:
+        return jsonify({"error": f"Error reading file: {str(e)}"}), 500
+
+@app.route('/write_file', methods=['POST'])
+def write_file():
+    data = request.json
+    file_path = data.get('path')
+    content = data.get('content')
+
+    if not file_path or content is None:
+        return jsonify({"error": "Both file path and content are required"}), 400
+
+    # Expand user path if necessary
+    file_path = os.path.expanduser(file_path)
+
+    try:
+        # Create directories if they don't exist
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(content)
+        return jsonify({"message": f"Successfully wrote to {file_path}"})
+    except Exception as e:
+        return jsonify({"error": f"Error writing file: {str(e)}"}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-interface WeeklySummary {
+export interface WeeklySummary {
   week: string;
   timestamp: number;
   summary: {
