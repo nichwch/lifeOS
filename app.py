@@ -106,7 +106,7 @@ def chat():
         }
         
         payload = {
-            "model": "gpt-4-turbo-preview",  # or "gpt-4" depending on your needs
+            "model": "gpt-4",  # or "gpt-4" depending on your needs
             "messages": messages
         }
         
