@@ -35,7 +35,7 @@ def group_files_by_week(directory):
 def summarize_weekly_notes(all_text_in_week, context):
     print('summarizing')
     response = openai.chat.completions.create(
-        model='gpt-4o',
+        model='gpt-4',
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"""Please summarize the following weekly notes, given the following context. 
@@ -107,8 +107,14 @@ def get_unsummarized_weeks(directory, output_file):
     try:
         with open(output_file, 'r') as f:
             summaries = json.load(f)
-        summarized_weeks = set(summary['week'] for summary in summaries)
-        unsummarized_weeks = {week: files for week, files in all_weeks.items() if week not in summarized_weeks}
+        # Create a dict mapping weeks to their files from existing summaries
+        existing_weeks = {summary['week']: set(summary.get('files', [])) for summary in summaries}
+        # Check both if week is new or if files have changed
+        unsummarized_weeks = {
+            week: files 
+            for week, files in all_weeks.items() 
+            if week not in existing_weeks or len(files) != len(existing_weeks[week])
+        }
     except FileNotFoundError:
         unsummarized_weeks = all_weeks
     
@@ -145,12 +151,21 @@ def summarize_new_notes(directory):
         weekly_summary = summarize_weekly_notes(all_text_in_week, context)
         context = weekly_summary['context']
         print('context', context)
-        summaries.append({
+        # Check if a summary for this week already exists
+        existing_summary_index = next((i for i, s in enumerate(summaries) if s['week'] == week), None)
+        new_entry = {
             'week': week,
             'timestamp': timestamp,
-            'summary': weekly_summary  
-        })
-        
+            'summary': weekly_summary,
+            'files': files
+        }
+        if existing_summary_index is not None:
+            # Update existing summary
+            summaries[existing_summary_index] = new_entry
+        else:
+            # Append new summary
+            summaries.append(new_entry)
+                
         # Write to the output file after each summary is generated
         summaries.sort(key=lambda x: x['timestamp'])
         with open(output_file, 'w') as f:
