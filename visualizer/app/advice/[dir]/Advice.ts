@@ -11,6 +11,8 @@ export const generateAdvice = async (
   const prompt = `${identityBlurb}
     Based on this person's recent reflections, provide wise counsel about their life path.
     Here is their recent context:
+
+    Keep your advice concise and to the point, but also in your style and character.
     
     Overall summary: ${latestSummary.summary.overall_summary}
     ${
