@@ -4,6 +4,7 @@ import json
 import os
 
 import requests
+from advice import get_philosophical_advice
 import summarize
 
 app = Flask(__name__)
@@ -164,6 +165,45 @@ def write_file():
         return jsonify({"message": f"Successfully wrote to {file_path}"})
     except Exception as e:
         return jsonify({"error": f"Error writing file: {str(e)}"}), 500
+
+@app.route('/generate_advice', methods=['POST'])
+def generate_advice():
+    data = request.json
+    philosophers = data.get('philosophers', [])
+    directory = os.path.expanduser(data.get('directory', '~/notes'))
+
+    if not philosophers:
+        return jsonify({"error": "No philosophers provided"}), 400
+
+    try:
+        advice_list = []
+        for philosopher in philosophers:
+            advice = json.loads(get_philosophical_advice(directory, philosopher))
+            advice['philosopher'] = philosopher
+            advice_list.append(advice)
+
+        # Write to advice.json in the specified directory
+        advice_path = os.path.join(directory, 'advice.json')
+        with open(advice_path, 'w') as f:
+            json.dump(advice_list, f, indent=4)
+
+        return jsonify(advice_list)
+    except Exception as e:
+        return jsonify({"error": f"Error getting philosophical advice: {str(e)}"}), 500
+
+@app.route('/get_advice', methods=['GET'])
+def get_saved_advice():
+    directory = os.path.expanduser(request.args.get('directory', '~/notes'))
+    advice_path = os.path.join(directory, 'advice.json')
+    
+    try:
+        with open(advice_path, 'r') as f:
+            advice_list = json.load(f)
+        return jsonify(advice_list)
+    except FileNotFoundError:
+        return jsonify({"error": "No advice file found"}), 404
+    except Exception as e:
+        return jsonify({"error": f"Error reading advice file: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
