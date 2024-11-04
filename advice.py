@@ -81,4 +81,4 @@ def get_philosophical_advice(note_dir, identity="a wise philosopher"):
         return f"Error generating advice: {str(e)}"
 
 # Example usage:
-print(get_philosophical_advice('~/notes', "Milan Kundera"))
+print(get_philosophical_advice('~/notes', "Steve Jobs"))
