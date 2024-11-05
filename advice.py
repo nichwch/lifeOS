@@ -58,7 +58,12 @@ def get_philosophical_advice(note_dir, identity="a wise philosopher"):
                             "items": {
                                 "type": "string"
                             },
-                            "description": "2-3 quotes from the author that relate to the user's situation"
+                            "description": f"""2-3 quotes from {identity} that relate to the user's situation. 
+Do not make up quotes, make sure they are by {identity}. 
+Include a precise citation for which book or speech the quote is from - if you cannot find a source, it is likely a fake quote, and you
+shouldn't output it. Err on the side of not producing a quote at all, 
+than producing a quote that was not spoken by the {identity}. Do not hallucinate fake quotations by {identity}. 
+Only include the quote and citation - no need for an explanation."""
                         },
                         "praise": {
                             "type": "string",
