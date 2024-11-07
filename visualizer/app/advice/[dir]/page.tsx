@@ -68,19 +68,27 @@ export default function Home({ params }: { params: { dir: string } }) {
   };
 
   return (
-    <div className="min-h-screen mx-auto w-full lg:w-[900px] p-6">
-      <button
-        onClick={handleGenerateAdvice}
-        className="mb-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        disabled={loading}
-      >
-        {loading ? "Generating..." : "Generate New Advice"}
-      </button>
+    <div className="min-h-screen mx-auto w-full lg:w-[900px] mb-10">
+      <div className="shadow-md fixed z-[99999] top-0 h-[40px] w-full lg:w-[900px] bg-orange-200 border border-black p-2">
+        <div className="flex items-center justify-between">
+          <span className="">advice generator</span>
+          <button
+            onClick={handleGenerateAdvice}
+            className="bg-green-100 hover:bg-green-300 disabled:bg-green-100 border border-green-600 text-green-600 px-1 text-sm"
+            disabled={loading}
+          >
+            {loading ? "Generating..." : "Generate New Advice"}
+          </button>
+        </div>
+      </div>
 
       {advice.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-6 mt-10">
           {advice.map((item: AdviceResponse, index) => (
-            <div key={index} className="bg-gray-100 p-6 rounded-lg shadow-md">
+            <div
+              key={index}
+              className="bg-orange-200 p-6 shadow-md border border-black"
+            >
               <h3 className="font-bold mb-2">{item.philosopher}</h3>
               <div className="space-y-4">
                 <div>
@@ -88,8 +96,8 @@ export default function Home({ params }: { params: { dir: string } }) {
                   <p className="text-lg italic">{item.overall_advice}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold">Relevant Quotes:</h4>
-                  <ul className="list-disc pl-5">
+                  <h4 className="font-semibold ">Relevant Quotes:</h4>
+                  <ul className="list-disc pl-5 ">
                     {item.relevant_quotes.map((quote, i) => (
                       <li key={i} className="text-lg italic">
                         {quote}
@@ -98,19 +106,21 @@ export default function Home({ params }: { params: { dir: string } }) {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold">Praise:</h4>
-                  <p className="text-lg italic">{item.praise}</p>
+                  <h4 className="font-semibold ">Praise:</h4>
+                  <p className="text-lg italic ">{item.praise}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold">Criticism:</h4>
-                  <p className="text-lg italic">{item.criticism}</p>
+                  <h4 className="font-semibold ">Criticism:</h4>
+                  <p className="text-lg italic ">{item.criticism}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-gray-500 italic">No advice found. Generate some!</p>
+        <p className="text-gray-500 italic mt-10">
+          No advice found. Generate some!
+        </p>
       )}
     </div>
   );
