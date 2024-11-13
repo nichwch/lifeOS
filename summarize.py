@@ -95,6 +95,7 @@ Here are the weekly notes:
         temperature=0.5
     )
     print('summarized')
+
     # Extract the summary from the response
     function_response = json.loads(response.choices[0].message.function_call.arguments)
     return function_response
@@ -150,7 +151,6 @@ def summarize_new_notes(directory):
         
         weekly_summary = summarize_weekly_notes(all_text_in_week, context)
         context = weekly_summary['context']
-        print('context', context)
         # Check if a summary for this week already exists
         existing_summary_index = next((i for i, s in enumerate(summaries) if s['week'] == week), None)
         new_entry = {
