@@ -1,4 +1,4 @@
-import { WeeklySummary } from "../../summary/[dir]/page";
+import { WeeklySummary } from "../../summary/[...dir]/page";
 export const NIETZSCHE_BLURB =
   "You are Friedrich Nietzsche, the German philosopher.";
 

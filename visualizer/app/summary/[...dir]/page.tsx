@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { directoryFromParams } from "../../../lib/utils";
 
 export interface WeeklySummary {
   week: string;
@@ -29,9 +30,10 @@ export default function Home({ params }: { params: { dir: string } }) {
   }, [params.dir]);
 
   const fetchData = async () => {
+    // Handle both array and string cases for directory path
+    const directory = directoryFromParams(params.dir);
+    const encodedDirectory = encodeURIComponent("~/" + directory);
     try {
-      const encodedDirectory = encodeURIComponent("~/" + params.dir);
-
       // Fetch summaries
       const summariesResponse = await fetch(
         `http://127.0.0.1:5000/weekly_summaries?directory=${encodedDirectory}`
@@ -47,13 +49,15 @@ export default function Home({ params }: { params: { dir: string } }) {
       setUnsummarizedCount(countData.unsummarized_count);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setUnsummarizedCount(Infinity);
     }
   };
 
   const handleSummarize = async () => {
     setIsSummarizing(true);
     try {
-      const encodedDirectory = encodeURIComponent("~/" + params.dir);
+      const directory = directoryFromParams(params.dir);
+      const encodedDirectory = encodeURIComponent("~/" + directory);
       const response = await fetch(
         `http://127.0.0.1:5000/summarize?directory=${encodedDirectory}`,
         {
