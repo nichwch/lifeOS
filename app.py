@@ -47,7 +47,6 @@ def unsummarized_count():
 
 @app.route('/get_links', methods=['POST'])
 def get_links():
-    print('here!')
     # Get the text from the request body
     data = request.json
     text = data.get('text')
@@ -58,7 +57,6 @@ def get_links():
     try:
         # Make a request to Exa's API
         exa_api_key = os.environ.get('EXA_API_KEY')
-        print('exa_api_key', exa_api_key)
         if not exa_api_key:
             return jsonify({"error": "EXA_API_KEY not set in environment variables"}), 500
 
@@ -119,7 +117,6 @@ def chat():
         response.raise_for_status()
         
         # Return the response from OpenAI
-        print('response', response.json())
         return jsonify(response.json())
     
     except requests.RequestException as e:
