@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-const COUNSELORS = [
-  "Nietzsche",
-  "Milan Kundera",
-  "Dostoevsky",
-  "John Steinbeck",
-];
+import { directoryFromParams } from "../../../lib/utils";
 
 interface AdviceResponse {
   philosopher: string;
@@ -24,7 +18,8 @@ export default function Home({ params }: { params: { dir: string } }) {
   useEffect(() => {
     const fetchSavedAdvice = async () => {
       try {
-        const encodedDirectory = encodeURIComponent("~/" + params.dir);
+        const directory = directoryFromParams(params.dir);
+        const encodedDirectory = encodeURIComponent("~/" + directory);
         const response = await fetch(
           `http://127.0.0.1:5000/get_advice?directory=${encodedDirectory}`
         );
