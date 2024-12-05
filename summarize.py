@@ -79,6 +79,14 @@ Here are the weekly notes:
                             "type":"string",
                             "description":"A summary of complaints that the author has. Leave blank if there aren't complaints, in the second person past tense."
                         },
+                        'questions':{
+                            "type":"string",
+                            "description":"Some questions to prompt the author to journal further."
+                        },
+                        'answers':{
+                            "type":"string",
+                            "description":"Give advice and some answers to open questions in the author's life."
+                        },
                         "context":{
                             "type":"string",
                                 "description":"""A new summary of the author's overall life, based on the context given in the prompt. 
