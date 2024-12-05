@@ -144,7 +144,7 @@ export default function Home({ params }: { params: { dir: string } }) {
                         ? "bg-pink-200"
                         : key === "complaints"
                         ? "bg-red-300"
-                        : null;
+                        : "bg-gray-200";
                     if (
                       key !== "overall_summary" &&
                       key !== "main_themes" &&
