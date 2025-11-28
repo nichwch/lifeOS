@@ -8,7 +8,6 @@ export default function Home() {
       <div className="flex flex-col">
         <h1 className="mb-10 font-bold">LifeOS</h1>
         <Link href="/summary/notes">summaries</Link>
-        <Link href="/advice/notes">advice</Link>
       </div>
       <div className="ml-48 flex border-[2.5px] border-black h-[700px] box-content">
         <img
