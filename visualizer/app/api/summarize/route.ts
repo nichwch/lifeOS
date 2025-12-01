@@ -3,10 +3,11 @@ import {
   summaryFunctionDefinition,
   summaryMessages,
   SummaryResponseBody,
+  summaryToolDefinition,
 } from "@/lib/summarize";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const DEFAULT_MODEL = "openrouter/openai/gpt-4o-mini";
+const DEFAULT_MODEL = "gpt-5.1";
 
 interface SummarizeRequestBody {
   week: string;
@@ -16,16 +17,20 @@ interface SummarizeRequestBody {
 }
 
 const parseSummary = (raw: any): SummaryResponseBody["summary"] | null => {
-  const functionCall = raw?.choices?.[0]?.message?.function_call;
-  if (!functionCall?.arguments) {
+  const message = raw?.choices?.[0]?.message;
+  const maybeArgs =
+    message?.function_call?.arguments ??
+    message?.tool_calls?.[0]?.function?.arguments ??
+    (typeof message?.content === "string" ? message.content : null);
+
+  if (typeof maybeArgs !== "string") {
     return null;
   }
 
   try {
-    const parsed = JSON.parse(functionCall.arguments);
-    return parsed;
+    return JSON.parse(maybeArgs);
   } catch (error) {
-    console.error("Failed to parse function call arguments", error);
+    console.error("Failed to parse summary payload", { maybeArgs, error });
     return null;
   }
 };
@@ -54,7 +59,7 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-
+// bump
   try {
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
@@ -66,13 +71,17 @@ export async function POST(request: Request) {
         model: model || DEFAULT_MODEL,
         temperature: 0.5,
         messages: summaryMessages(notes, context),
-        functions: [summaryFunctionDefinition],
-        function_call: { name: summaryFunctionDefinition.name },
+        tools: [summaryToolDefinition],
+        tool_choice: {
+          type: "function",
+          function: { name: summaryFunctionDefinition.name },
+        },
       }),
     });
 
     if (!response.ok) {
       const errorResponse = await response.text();
+      console.log(errorResponse);
       return NextResponse.json(
         { error: "OpenRouter request failed", details: errorResponse },
         { status: response.status }

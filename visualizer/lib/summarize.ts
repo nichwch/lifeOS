@@ -75,6 +75,11 @@ export const summaryFunctionDefinition = {
   },
 };
 
+export const summaryToolDefinition = {
+  type: "function",
+  function: summaryFunctionDefinition,
+} as const;
+
 export interface SummaryResponseBody {
   week: string;
   summary: {
